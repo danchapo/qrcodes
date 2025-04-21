@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subir PDF con QR</title>
+</head>
+<body>
+  <h1>Formulario PDF + QR</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="text" name="nombre" placeholder="Nombre" required><br>
+    <input type="text" name="cliente" placeholder="Cliente" required><br>
+    <input type="file" name="pdf" accept="application/pdf" required><br>
+    <button type="submit">Enviar</button>
+  </form>
+  <div id="qr"></div>
+  <hr>
+  <h2>Registros</h2>
+  <table id="pdfTable" border="1">
+    <thead>
+      <tr><th>ID</th><th>Nombre</th><th>Cliente</th><th>PDF</th><th>Fecha</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script>
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const res = await fetch("/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      document.getElementById("qr").innerHTML = `<p><strong>QR generado:</strong><br><img src="${data.qr}" /></p>`;
+      loadTable();
+    });
+
+    async function loadTable() {
+      const res = await fetch("/all");
+      const data = await res.json();
+      const tbody = document.querySelector("#pdfTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.id}</td>
+          <td>${row.nombre}</td>
+          <td>${row.cliente}</td>
+          <td><a href="/uploads/${row.filename}" target="_blank">Ver PDF</a></td>
+          <td>${row.fecha}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.onload = loadTable;
+  </script>
+</body>
+</html>
