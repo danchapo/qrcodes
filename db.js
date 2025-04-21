@@ -2,7 +2,7 @@ const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("database.db");
 
 db.serialize(() => {
-  db.run(\`
+  db.run(`
     CREATE TABLE IF NOT EXISTS pdfs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       nombre TEXT,
@@ -10,7 +10,7 @@ db.serialize(() => {
       filename TEXT,
       fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
-  \`);
+  `);
 });
 
 function insertPDF(nombre, cliente, filename) {
